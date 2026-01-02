@@ -7,6 +7,12 @@ select salary from employees;
 
 -- 2. How to get the nth highest salary in ?
 
+select salary
+from (select salary,
+	dense_rank() over (ORDER BY salary DESC) AS rankk
+    from employees) As ranked_salaries
+    where rankk = N;
+
 
 -- 3. How do you fetch all employees whose salary is greater than the average salary?
 
@@ -38,6 +44,20 @@ ON e.salary = dup.salary
 ORDER BY e.salary, e.employee_id;
 
 -- 6. How can you delete duplicate rows in ?
+
+WITH CTE AS (
+    SELECT employee_id, salary,
+           ROW_NUMBER() OVER (PARTITION BY salary ORDER BY employee_id) AS row_num
+    FROM employees
+)
+DELETE FROM employees
+WHERE employee_id IN (
+    SELECT employee_id
+    FROM CTE
+    WHERE row_num > 1
+);
+
+
 
 -- 7. How to get the common records from two tables?
 
